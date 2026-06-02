@@ -7,29 +7,40 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <!-- Google Identity Services SDK -->
 <script src="https://accounts.google.com/gsi/client" async defer>
-function signUp(event){
-event.preventDefault();
+// ===== FINAL AUTH SYSTEM =====
+function signUp(e){
+if(e)e.preventDefault();
 const name=document.querySelector('#form-signup input[type="text"]').value;
 const email=document.querySelector('#form-signup input[type="email"]').value;
 const password=document.querySelector('#form-signup input[type="password"]').value;
-localStorage.setItem('currentUser',JSON.stringify({name,email,password,avatar:'https://ui-avatars.com/api/?name='+encodeURIComponent(name)}));
+localStorage.setItem('currentUser',JSON.stringify({name,email,password}));
 localStorage.setItem('loggedIn','true');
 closeAuthModal();
 updateNavbar();
+alert('Account created');
+return false;
 }
 
-function signIn(event){
-event.preventDefault();
+function signIn(e){
+if(e)e.preventDefault();
 const email=document.querySelector('#form-signin input[type="email"]').value;
 const password=document.querySelector('#form-signin input[type="password"]').value;
 const user=JSON.parse(localStorage.getItem('currentUser')||'null');
-if(!user){alert('Create an account first');return;}
+if(!user){alert('Create an account first');return false;}
 if(user.email===email && user.password===password){
 localStorage.setItem('loggedIn','true');
 closeAuthModal();
 updateNavbar();
-}else{
-alert('Invalid email or password');
+}
+return false;
+}
+
+function updateNavbar(){
+const nav=document.querySelector('.nav-actions');
+if(localStorage.getItem('loggedIn')==='true'){
+nav.innerHTML=`
+<div style="width:40px;height:40px;border-radius:50%;background:#1a6b4a;color:white;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:bold"
+onclick="logoutUser()">👤</div>`;
 }
 }
 
@@ -38,42 +49,17 @@ localStorage.removeItem('loggedIn');
 location.reload();
 }
 
-function updateNavbar(){
-const nav=document.querySelector('.nav-actions');
-if(localStorage.getItem('loggedIn')==='true'){
-const user=JSON.parse(localStorage.getItem('currentUser')||'{}');
-nav.innerHTML=`
-<div onclick="logoutUser()" title="Logout" style="width:42px;height:42px;border-radius:50%;overflow:hidden;cursor:pointer;border:2px solid #e4e0da;">
-<img src="${user.avatar||'https://ui-avatars.com/api/?name=User'}" style="width:100%;height:100%;object-fit:cover;">
-</div>`;
-}
-}
-
-document.addEventListener('DOMContentLoaded',()=>{
-updateNavbar();
-
-document.querySelectorAll('.btn-book').forEach(btn=>{
-btn.onclick=function(){
+document.addEventListener('click',function(e){
+if(e.target.classList.contains('btn-book')){
 if(localStorage.getItem('loggedIn')!=='true'){
 openAuthModal('signin');
 return;
 }
-const id='LP-'+Math.random().toString(36).substring(2,8).toUpperCase();
-alert('Booking Confirmed! Booking ID: '+id);
-};
+alert('Booking Confirmed!');
+}
 });
 
-const plans=document.querySelector('.btn-white');
-if(plans){
-plans.onclick=function(){
-if(localStorage.getItem('loggedIn')!=='true'){
-openAuthModal('signup');
-}else{
-alert('Membership plans coming soon!');
-}
-};
-}
-});
+document.addEventListener('DOMContentLoaded',updateNavbar);
 
 </script>
 
@@ -607,7 +593,7 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
       <div class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Join Free</div>
     </div>
 
-    <form class="auth-form active" id="form-signin" onsubmit="signIn(event)">
+    <form class="auth-form active" id="form-signin" onsubmit="return false;">
       
       <!-- Google Signin Button -->
       <div class="google-btn-wrapper">
@@ -630,7 +616,7 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
       </div>
     </form>
 
-    <form class="auth-form" id="form-signup" onsubmit="signUp(event)">
+    <form class="auth-form" id="form-signup" onsubmit="return false;">
       
       <!-- Google Signup Button -->
       <div class="google-btn-wrapper">
@@ -874,11 +860,9 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
   // 3. GOOGLE IDENTITY SERVICES INIT
   // ========================================
   function handleCredentialResponse(response) {
+    console.log("Encoded JWT ID token: " + response.credential);
     localStorage.setItem('loggedIn','true');
-    localStorage.setItem('currentUser', JSON.stringify({
-      name:'Google User',
-      avatar:'https://ui-avatars.com/api/?name=Google+User'
-    }));
+    localStorage.setItem('currentUser',JSON.stringify({name:'Google User'}));
     closeAuthModal();
     updateNavbar();
   }
