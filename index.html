@@ -6,7 +6,66 @@
 <title>LoungePass</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <!-- Google Identity Services SDK -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://accounts.google.com/gsi/client" async defer>
+// ===== USER AUTH + BOOKING FIX =====
+function signUp(event){
+event.preventDefault();
+const name=document.querySelector('#form-signup input[type="text"]').value;
+const email=document.querySelector('#form-signup input[type="email"]').value;
+const password=document.querySelector('#form-signup input[type="password"]').value;
+if(!name||!email||!password){alert('Please fill all fields');return;}
+localStorage.setItem('currentUser',JSON.stringify({name,email,password}));
+localStorage.setItem('loggedIn','true');
+alert('Account created successfully!');
+closeAuthModal();
+updateNavbar();
+}
+
+function signIn(event){
+event.preventDefault();
+const email=document.querySelector('#form-signin input[type="email"]').value;
+const password=document.querySelector('#form-signin input[type="password"]').value;
+const user=JSON.parse(localStorage.getItem('currentUser'));
+if(!user){alert('No account found. Create one first.');return;}
+if(user.email===email && user.password===password){
+localStorage.setItem('loggedIn','true');
+alert('Login successful!');
+closeAuthModal();
+updateNavbar();
+}else{
+alert('Invalid email or password');
+}
+}
+
+function logoutUser(){
+localStorage.removeItem('loggedIn');
+location.reload();
+}
+
+function updateNavbar(){
+const nav=document.querySelector('.nav-actions');
+if(localStorage.getItem('loggedIn')==='true'){
+const user=JSON.parse(localStorage.getItem('currentUser')||'{}');
+nav.innerHTML=`<span>Hello ${user.name||'User'}</span><button class="btn-solid" onclick="logoutUser()">Logout</button>`;
+}
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+updateNavbar();
+document.querySelectorAll('.btn-book').forEach(btn=>{
+btn.addEventListener('click',()=>{
+if(localStorage.getItem('loggedIn')!=='true'){
+alert('Please sign in first');
+openAuthModal('signin');
+return;
+}
+const id='LP-'+Math.random().toString(36).substring(2,8).toUpperCase();
+alert('Booking Confirmed! Booking ID: '+id);
+});
+});
+});
+
+</script>
 
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -434,7 +493,7 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
       <div class="card-footer">
         <div class="card-price"><strong>₹1,800</strong> / visit</div>
         <!-- Activated Book Button -->
-        <button class="btn-book" onclick="openAuthModal('signin')">Book now</button>
+        <button class="btn-book" >Book now</button>
       </div>
     </div>
   </div>
@@ -461,7 +520,7 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
       <div class="card-footer">
         <div class="card-price"><strong>₹1,200</strong> / visit</div>
         <!-- Activated Book Button -->
-        <button class="btn-book" onclick="openAuthModal('signin')">Book now</button>
+        <button class="btn-book" >Book now</button>
       </div>
     </div>
   </div>
@@ -489,7 +548,7 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
       <div class="card-footer">
         <div class="card-price"><strong>₹2,200</strong> / visit</div>
         <!-- Activated Book Button -->
-        <button class="btn-book" onclick="openAuthModal('signin')">Book now</button>
+        <button class="btn-book" >Book now</button>
       </div>
     </div>
   </div>
@@ -538,7 +597,7 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
       <div class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Join Free</div>
     </div>
 
-    <form class="auth-form active" id="form-signin" onsubmit="event.preventDefault();">
+    <form class="auth-form active" id="form-signin" onsubmit="signIn(event)">
       
       <!-- Google Signin Button -->
       <div class="google-btn-wrapper">
@@ -561,7 +620,7 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
       </div>
     </form>
 
-    <form class="auth-form" id="form-signup" onsubmit="event.preventDefault();">
+    <form class="auth-form" id="form-signup" onsubmit="signUp(event)">
       
       <!-- Google Signup Button -->
       <div class="google-btn-wrapper">
