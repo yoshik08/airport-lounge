@@ -7,16 +7,13 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <!-- Google Identity Services SDK -->
 <script src="https://accounts.google.com/gsi/client" async defer>
-// ===== USER AUTH + BOOKING FIX =====
 function signUp(event){
 event.preventDefault();
 const name=document.querySelector('#form-signup input[type="text"]').value;
 const email=document.querySelector('#form-signup input[type="email"]').value;
 const password=document.querySelector('#form-signup input[type="password"]').value;
-if(!name||!email||!password){alert('Please fill all fields');return;}
-localStorage.setItem('currentUser',JSON.stringify({name,email,password}));
+localStorage.setItem('currentUser',JSON.stringify({name,email,password,avatar:'https://ui-avatars.com/api/?name='+encodeURIComponent(name)}));
 localStorage.setItem('loggedIn','true');
-alert('Account created successfully!');
 closeAuthModal();
 updateNavbar();
 }
@@ -25,11 +22,10 @@ function signIn(event){
 event.preventDefault();
 const email=document.querySelector('#form-signin input[type="email"]').value;
 const password=document.querySelector('#form-signin input[type="password"]').value;
-const user=JSON.parse(localStorage.getItem('currentUser'));
-if(!user){alert('No account found. Create one first.');return;}
+const user=JSON.parse(localStorage.getItem('currentUser')||'null');
+if(!user){alert('Create an account first');return;}
 if(user.email===email && user.password===password){
 localStorage.setItem('loggedIn','true');
-alert('Login successful!');
 closeAuthModal();
 updateNavbar();
 }else{
@@ -46,23 +42,37 @@ function updateNavbar(){
 const nav=document.querySelector('.nav-actions');
 if(localStorage.getItem('loggedIn')==='true'){
 const user=JSON.parse(localStorage.getItem('currentUser')||'{}');
-nav.innerHTML=`<span>Hello ${user.name||'User'}</span><button class="btn-solid" onclick="logoutUser()">Logout</button>`;
+nav.innerHTML=`
+<div onclick="logoutUser()" title="Logout" style="width:42px;height:42px;border-radius:50%;overflow:hidden;cursor:pointer;border:2px solid #e4e0da;">
+<img src="${user.avatar||'https://ui-avatars.com/api/?name=User'}" style="width:100%;height:100%;object-fit:cover;">
+</div>`;
 }
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
 updateNavbar();
+
 document.querySelectorAll('.btn-book').forEach(btn=>{
-btn.addEventListener('click',()=>{
+btn.onclick=function(){
 if(localStorage.getItem('loggedIn')!=='true'){
-alert('Please sign in first');
 openAuthModal('signin');
 return;
 }
 const id='LP-'+Math.random().toString(36).substring(2,8).toUpperCase();
 alert('Booking Confirmed! Booking ID: '+id);
+};
 });
-});
+
+const plans=document.querySelector('.btn-white');
+if(plans){
+plans.onclick=function(){
+if(localStorage.getItem('loggedIn')!=='true'){
+openAuthModal('signup');
+}else{
+alert('Membership plans coming soon!');
+}
+};
+}
 });
 
 </script>
@@ -493,7 +503,7 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
       <div class="card-footer">
         <div class="card-price"><strong>₹1,800</strong> / visit</div>
         <!-- Activated Book Button -->
-        <button class="btn-book" >Book now</button>
+        <button class="btn-book" onclick="openAuthModal('signin')">Book now</button>
       </div>
     </div>
   </div>
@@ -520,7 +530,7 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
       <div class="card-footer">
         <div class="card-price"><strong>₹1,200</strong> / visit</div>
         <!-- Activated Book Button -->
-        <button class="btn-book" >Book now</button>
+        <button class="btn-book" onclick="openAuthModal('signin')">Book now</button>
       </div>
     </div>
   </div>
@@ -548,7 +558,7 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
       <div class="card-footer">
         <div class="card-price"><strong>₹2,200</strong> / visit</div>
         <!-- Activated Book Button -->
-        <button class="btn-book" >Book now</button>
+        <button class="btn-book" onclick="openAuthModal('signin')">Book now</button>
       </div>
     </div>
   </div>
@@ -864,9 +874,13 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
   // 3. GOOGLE IDENTITY SERVICES INIT
   // ========================================
   function handleCredentialResponse(response) {
-    console.log("Encoded JWT ID token: " + response.credential);
-    alert("Successfully authenticated with Google! Check console for token.");
+    localStorage.setItem('loggedIn','true');
+    localStorage.setItem('currentUser', JSON.stringify({
+      name:'Google User',
+      avatar:'https://ui-avatars.com/api/?name=Google+User'
+    }));
     closeAuthModal();
+    updateNavbar();
   }
 
   window.onload = function () {
