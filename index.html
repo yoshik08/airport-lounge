@@ -6,61 +6,63 @@
 <title>LoungePass</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <!-- Google Identity Services SDK -->
-<script src="https://accounts.google.com/gsi/client" async defer>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
 // ===== FINAL AUTH SYSTEM =====
 function signUp(e){
-if(e)e.preventDefault();
-const name=document.querySelector('#form-signup input[type="text"]').value;
-const email=document.querySelector('#form-signup input[type="email"]').value;
-const password=document.querySelector('#form-signup input[type="password"]').value;
-localStorage.setItem('currentUser',JSON.stringify({name,email,password}));
-localStorage.setItem('loggedIn','true');
-closeAuthModal();
-updateNavbar();
-alert('Account created');
-return false;
+  if(e) e.preventDefault();
+  const name=document.querySelector('#form-signup input[type="text"]').value;
+  const email=document.querySelector('#form-signup input[type="email"]').value;
+  const password=document.querySelector('#form-signup input[type="password"]').value;
+  localStorage.setItem('currentUser',JSON.stringify({name,email,password}));
+  localStorage.setItem('loggedIn','true');
+  closeAuthModal();
+  updateNavbar();
+  alert('Account created');
+  return false;
 }
 
 function signIn(e){
-if(e)e.preventDefault();
-const email=document.querySelector('#form-signin input[type="email"]').value;
-const password=document.querySelector('#form-signin input[type="password"]').value;
-const user=JSON.parse(localStorage.getItem('currentUser')||'null');
-if(!user){alert('Create an account first');return false;}
-if(user.email===email && user.password===password){
-localStorage.setItem('loggedIn','true');
-closeAuthModal();
-updateNavbar();
-}
-return false;
+  if(e) e.preventDefault();
+  const email=document.querySelector('#form-signin input[type="email"]').value;
+  const password=document.querySelector('#form-signin input[type="password"]').value;
+  const user=JSON.parse(localStorage.getItem('currentUser')||'null');
+  if(!user){alert('Create an account first');return false;}
+  if(user.email===email && user.password===password){
+    localStorage.setItem('loggedIn','true');
+    closeAuthModal();
+    updateNavbar();
+  } else {
+    alert('Invalid credentials');
+  }
+  return false;
 }
 
 function updateNavbar(){
-const nav=document.querySelector('.nav-actions');
-if(localStorage.getItem('loggedIn')==='true'){
-nav.innerHTML=`
-<div style="width:40px;height:40px;border-radius:50%;background:#1a6b4a;color:white;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:bold"
-onclick="logoutUser()">👤</div>`;
-}
+  const nav=document.querySelector('.nav-actions');
+  if(localStorage.getItem('loggedIn')==='true'){
+    nav.innerHTML=`
+    <div style="width:40px;height:40px;border-radius:50%;background:#1a6b4a;color:white;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:bold"
+    onclick="logoutUser()" title="Logout">👤</div>`;
+  }
 }
 
 function logoutUser(){
-localStorage.removeItem('loggedIn');
-location.reload();
+  localStorage.removeItem('loggedIn');
+  location.reload();
 }
 
 document.addEventListener('click',function(e){
-if(e.target.classList.contains('btn-book')){
-if(localStorage.getItem('loggedIn')!=='true'){
-openAuthModal('signin');
-return;
-}
-alert('Booking Confirmed!');
-}
+  if(e.target.classList.contains('btn-book')){
+    if(localStorage.getItem('loggedIn')!=='true'){
+      openAuthModal('signin');
+      return;
+    }
+    alert('Booking Confirmed!');
+  }
 });
 
 document.addEventListener('DOMContentLoaded',updateNavbar);
-
 </script>
 
 <style>
@@ -593,8 +595,7 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
       <div class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Join Free</div>
     </div>
 
-    <form class="auth-form active" id="form-signin" onsubmit="return false;">
-      
+    <form class="auth-form active" id="form-signin" onsubmit="return signIn(event)">
       <!-- Google Signin Button -->
       <div class="google-btn-wrapper">
         <div id="google-signin-btn"></div>
@@ -616,8 +617,7 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
       </div>
     </form>
 
-    <form class="auth-form" id="form-signup" onsubmit="return false;">
-      
+    <form class="auth-form" id="form-signup" onsubmit="return signUp(event)">
       <!-- Google Signup Button -->
       <div class="google-btn-wrapper">
         <div id="google-signup-btn"></div>
@@ -857,21 +857,28 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
   }
 
   // ========================================
-  // 3. GOOGLE IDENTITY SERVICES INIT
+  // 3. GOOGLE IDENTITY SERVICES INIT (FIXED)
   // ========================================
   function handleCredentialResponse(response) {
-    console.log("Encoded JWT ID token: " + response.credential);
-    localStorage.setItem('loggedIn','true');
-    localStorage.setItem('currentUser',JSON.stringify({name:'Google User'}));
-    closeAuthModal();
-    updateNavbar();
+    if(response.credential) {
+      console.log("Encoded JWT ID token: " + response.credential);
+      localStorage.setItem('loggedIn','true');
+      localStorage.setItem('currentUser',JSON.stringify({name:'Google User'}));
+      closeAuthModal();
+      updateNavbar();
+      alert("Successfully logged in with Google!");
+    } else {
+      alert("Something went wrong with Google Login.");
+    }
   }
 
   window.onload = function () {
-    // Initialize Google SDK
+    // Initialize Google SDK with FedCM fix
     google.accounts.id.initialize({
       client_id: "976848195359-mh3lf51qst8o8jeuq6p8u99me619cktu.apps.googleusercontent.com",
-      callback: handleCredentialResponse
+      callback: handleCredentialResponse,
+      use_fedcm_for_prompt: true, // <--- Fixes the popup loop issue on deployed sites
+      auto_select: false
     });
 
     // Render Sign In Button
