@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>LoungePass</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<!-- Google Identity Services SDK -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <style>
@@ -307,16 +308,36 @@ footer p{font-size:12px;color:var(--ink3)}
   font-weight: 500;
 }
 
-/* Google Signin Container formatting */
 .google-btn-wrapper {
   display: flex;
   justify-content: center;
   width: 100%;
 }
+
+/* ========================================
+  ADMIN PORTAL EXTENSION CSS
+======================================== */
+.admin-fab{position:fixed;bottom:25px;right:25px;background:#1a6b4a;color:#fff;
+border:none;padding:14px 22px;border-radius:999px;cursor:pointer;z-index:999;
+box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; font-weight: 500;}
+.admin-fab:hover{background:#145c3d}
+
+.admin-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000}
+.admin-modal-content{background:white;max-width:1000px;margin:40px auto;padding:24px;border-radius:16px; font-family: 'DM Sans', sans-serif;}
+.admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px}
+.stat-card{background:#f8f8f8;padding:16px;border-radius:12px; text-align: center;}
+.stat-card h3{font-family:'DM Serif Display',serif; font-size: 28px; margin-bottom: 4px;}
+.verify-box,.member-box{background:#fafafa;padding:16px;border-radius:12px;margin-top:15px; border: 1px solid var(--border);}
+.verify-box h3, .member-box h3 { margin-bottom: 12px; font-size: 16px;}
+.admin-table{width:100%;border-collapse:collapse; margin-top: 10px; font-size: 14px;}
+.admin-table th,.admin-table td{padding:10px;border-bottom:1px solid #ddd; text-align: left;}
+.admin-input{width:100%;padding:10px;margin:5px 0; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif;}
+.admin-delete-btn{background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;}
 </style>
 </head>
 <body>
 
+<!-- NAV -->
 <nav>
   <div class="nav-logo">Lounge<span>Pass</span></div>
   <ul class="nav-links">
@@ -331,6 +352,7 @@ footer p{font-size:12px;color:var(--ink3)}
   </div>
 </nav>
 
+<!-- HERO -->
 <div style="max-width:1100px;margin:0 auto">
 <section class="hero">
   <div class="hero-tag">Airport Lounge Access</div>
@@ -338,6 +360,7 @@ footer p{font-size:12px;color:var(--ink3)}
   <p>Book premium airport lounges worldwide. Verify membership, invite guests, and get your QR entry pass — all in one place.</p>
 </section>
 
+<!-- SEARCH -->
 <div style="padding:0 48px;max-width:1100px;margin:0 auto 16px">
   <div class="search-box">
     <div class="search-field">
@@ -366,10 +389,12 @@ footer p{font-size:12px;color:var(--ink3)}
         <option>+ 3 guests</option>
       </select>
     </div>
-    <button class="search-btn">Search lounges</button>
+    <!-- Activated Search Button -->
+    <button class="search-btn" onclick="alert('Searching for available lounges matching your criteria...')">Search lounges</button>
   </div>
 </div>
 
+<!-- STATS -->
 <div class="stats">
   <div class="stat-item"><span class="stat-num">240+</span><span class="stat-label">Lounges worldwide</span></div>
   <div class="stat-item"><span class="stat-num">58</span><span class="stat-label">Airports covered</span></div>
@@ -378,6 +403,7 @@ footer p{font-size:12px;color:var(--ink3)}
 </div>
 </div>
 
+<!-- FEATURED LOUNGES -->
 <div style="max-width:1196px;margin:0 auto">
 <div class="section-header">
   <h2>Featured lounges</h2>
@@ -385,6 +411,7 @@ footer p{font-size:12px;color:var(--ink3)}
 </div>
 
 <div class="cards-grid">
+  <!-- Card 1 -->
   <div class="card">
     <div class="card-img-placeholder">
       <span class="card-img-icon">✈</span>
@@ -406,11 +433,13 @@ footer p{font-size:12px;color:var(--ink3)}
       </div>
       <div class="card-footer">
         <div class="card-price"><strong>₹1,800</strong> / visit</div>
-        <button class="btn-book">Book now</button>
+        <!-- Activated Book Button -->
+        <button class="btn-book" onclick="openAuthModal('signin')">Book now</button>
       </div>
     </div>
   </div>
 
+  <!-- Card 2 -->
   <div class="card">
     <div class="card-img-placeholder" style="background:linear-gradient(135deg,#e8eef5,#d0dae8)">
       <span class="card-img-icon">🌐</span>
@@ -431,11 +460,13 @@ footer p{font-size:12px;color:var(--ink3)}
       </div>
       <div class="card-footer">
         <div class="card-price"><strong>₹1,200</strong> / visit</div>
-        <button class="btn-book">Book now</button>
+        <!-- Activated Book Button -->
+        <button class="btn-book" onclick="openAuthModal('signin')">Book now</button>
       </div>
     </div>
   </div>
 
+  <!-- Card 3 -->
   <div class="card">
     <div class="card-img-placeholder" style="background:linear-gradient(135deg,#f0ebe8,#e8ddd8)">
       <span class="card-img-icon">🛋</span>
@@ -457,12 +488,14 @@ footer p{font-size:12px;color:var(--ink3)}
       </div>
       <div class="card-footer">
         <div class="card-price"><strong>₹2,200</strong> / visit</div>
-        <button class="btn-book">Book now</button>
+        <!-- Activated Book Button -->
+        <button class="btn-book" onclick="openAuthModal('signin')">Book now</button>
       </div>
     </div>
   </div>
 </div>
 
+<!-- MEMBERSHIP BANNER -->
 <div style="padding:0 48px;max-width:1100px;margin:0 auto">
 <div class="membership-banner">
   <div class="banner-text">
@@ -474,16 +507,23 @@ footer p{font-size:12px;color:var(--ink3)}
     <div class="tier gold"><div class="tier-name">Gold</div><div class="tier-badge">2 guests</div></div>
     <div class="tier platinum"><div class="tier-name">Platinum</div><div class="tier-badge">4 guests</div></div>
   </div>
-  <button class="btn-white">View plans</button>
+  <!-- Activated View Plans Button -->
+  <button class="btn-white" onclick="openAuthModal('signup')">View plans</button>
 </div>
 </div>
 </div>
 
+<!-- FOOTER -->
 <footer>
   <div class="footer-logo">Lounge<span>Pass</span></div>
   <p>© 2026 LoungePass. All rights reserved.</p>
 </footer>
 
+<!-- 
+========================================
+  AUTHENTICATION MODAL
+======================================== 
+-->
 <div class="modal-overlay" id="authModal">
   <div class="modal-container">
     <button class="modal-close" onclick="closeAuthModal()">✕</button>
@@ -500,6 +540,7 @@ footer p{font-size:12px;color:var(--ink3)}
 
     <form class="auth-form active" id="form-signin" onsubmit="event.preventDefault();">
       
+      <!-- Google Signin Button -->
       <div class="google-btn-wrapper">
         <div id="google-signin-btn"></div>
       </div>
@@ -522,6 +563,7 @@ footer p{font-size:12px;color:var(--ink3)}
 
     <form class="auth-form" id="form-signup" onsubmit="event.preventDefault();">
       
+      <!-- Google Signup Button -->
       <div class="google-btn-wrapper">
         <div id="google-signup-btn"></div>
       </div>
@@ -548,40 +590,103 @@ footer p{font-size:12px;color:var(--ink3)}
   </div>
 </div>
 
+<!-- 
+========================================
+  ADMIN PORTAL MODAL
+======================================== 
+-->
+<button class="admin-fab" onclick="openAdmin()">Admin Portal</button>
+
+<div class="admin-modal" id="adminModal">
+  <div class="admin-modal-content">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h2>Airport Lounge Management</h2>
+      <button class="btn-ghost" onclick="closeAdmin()">Close</button>
+    </div>
+
+    <div id="loginArea">
+      <input class="admin-input" id="adminUser" placeholder="Username" value="admin">
+      <input class="admin-input" id="adminPass" type="password" placeholder="Password" value="admin123">
+      <button class="btn-solid" onclick="adminLogin()" style="margin-top: 10px;">Login</button>
+    </div>
+
+    <div id="dashboard" style="display:none">
+      <div class="admin-grid">
+        <div class="stat-card"><h3 id="memberCount">0</h3><p>Members</p></div>
+        <div class="stat-card"><h3 id="checkins">0</h3><p>Check-ins</p></div>
+        <div class="stat-card"><h3>58</h3><p>Lounges</p></div>
+        <div class="stat-card"><h3>87%</h3><p>Occupancy</p></div>
+      </div>
+
+      <div class="verify-box">
+        <h3>Passenger Verification</h3>
+        <input class="admin-input" id="verifyValue" placeholder="Ticket / Mobile / Member ID">
+        <button class="btn-solid" onclick="verifyMember()">Verify Access</button>
+        <div id="verifyResult" style="margin-top: 10px;"></div>
+      </div>
+
+      <div class="member-box">
+        <h3>Add Member</h3>
+        <input class="admin-input" id="mName" placeholder="Name">
+        <input class="admin-input" id="mMobile" placeholder="Mobile">
+        <input class="admin-input" id="mTicket" placeholder="Ticket Number">
+        <select class="admin-input" id="mType">
+          <option>Silver</option>
+          <option>Gold</option>
+          <option>Platinum</option>
+        </select>
+        <button class="btn-solid" onclick="addMember()">Add Member</button>
+      </div>
+
+      <div class="member-box">
+        <h3>Member Database</h3>
+        <table class="admin-table">
+          <thead>
+            <tr><th>ID</th><th>Name</th><th>Mobile</th><th>Ticket</th><th>Tier</th><th>Visits</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="memberTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 
+========================================
+  UNIFIED JAVASCRIPT LOGIC
+======================================== 
+-->
 <script>
-  // -- UI LOGIC --
-  const modal = document.getElementById('authModal');
+  // ========================================
+  // 1. AUTHENTICATION & UI MODAL LOGIC
+  // ========================================
+  const authModal = document.getElementById('authModal');
   const title = document.getElementById('modalTitle');
   const desc = document.getElementById('modalDesc');
 
   function openAuthModal(type) {
-    modal.classList.add('active');
+    authModal.classList.add('active');
     switchAuthTab(type);
   }
 
   function closeAuthModal() {
-    modal.classList.remove('active');
+    authModal.classList.remove('active');
   }
 
-  // Close modal when clicking outside the container
-  modal.addEventListener('click', (e) => {
-    if(e.target === modal) {
-      closeAuthModal();
-    }
+  // Close Auth modal when clicking outside
+  authModal.addEventListener('click', (e) => {
+    if(e.target === authModal) closeAuthModal();
   });
 
   function switchAuthTab(type) {
-    // Reset tabs
     document.getElementById('tab-signin').classList.remove('active');
     document.getElementById('tab-signup').classList.remove('active');
     document.getElementById('form-signin').classList.remove('active');
     document.getElementById('form-signup').classList.remove('active');
 
-    // Activate selected
     document.getElementById(`tab-${type}`).classList.add('active');
     document.getElementById(`form-${type}`).classList.add('active');
 
-    // Update Header
     if(type === 'signin') {
       title.innerText = 'Welcome back';
       desc.innerText = 'Enter your details to access your account.';
@@ -591,33 +696,137 @@ footer p{font-size:12px;color:var(--ink3)}
     }
   }
 
-  // -- GOOGLE IDENTITY SERVICES LOGIC --
-  
-  // This function runs when the user successfully authenticates
+  // ========================================
+  // 2. ADMIN PORTAL LOGIC
+  // ========================================
+  let members = JSON.parse(localStorage.getItem("lounge_members")) || [
+    {id:"LP1001",name:"John Smith",mobile:"9876543210",ticket:"AI20456789",tier:"Gold",visits:3},
+    {id:"LP1002",name:"Sarah Lee",mobile:"9123456780",ticket:"UK83456712",tier:"Platinum",visits:5}
+  ];
+
+  // Map DOM elements after load
+  let adminElements = {};
+  document.addEventListener('DOMContentLoaded', () => {
+    adminElements = {
+      adminUser: document.getElementById('adminUser'),
+      adminPass: document.getElementById('adminPass'),
+      dashboard: document.getElementById('dashboard'),
+      loginArea: document.getElementById('loginArea'),
+      memberCount: document.getElementById('memberCount'),
+      memberTable: document.getElementById('memberTable'),
+      verifyValue: document.getElementById('verifyValue'),
+      verifyResult: document.getElementById('verifyResult'),
+      mName: document.getElementById('mName'),
+      mMobile: document.getElementById('mMobile'),
+      mTicket: document.getElementById('mTicket'),
+      mType: document.getElementById('mType')
+    };
+  });
+
+  function saveMembers(){
+    localStorage.setItem("lounge_members", JSON.stringify(members));
+    renderMembers();
+  }
+
+  function openAdmin(){ document.getElementById('adminModal').style.display='block'; }
+  function closeAdmin(){ document.getElementById('adminModal').style.display='none'; }
+
+  function adminLogin(){
+    if(adminElements.adminUser.value === "admin" && adminElements.adminPass.value === "admin123"){
+      adminElements.dashboard.style.display = "block";
+      adminElements.loginArea.style.display = "none";
+      renderMembers();
+    } else {
+      alert("Invalid login");
+    }
+  }
+
+  function renderMembers(){
+    adminElements.memberCount.innerText = members.length;
+    adminElements.memberTable.innerHTML = "";
+    members.forEach(m => {
+      adminElements.memberTable.innerHTML += `
+        <tr>
+          <td>${m.id}</td>
+          <td>${m.name}</td>
+          <td>${m.mobile}</td>
+          <td>${m.ticket}</td>
+          <td>${m.tier}</td>
+          <td>${m.visits}</td>
+          <td><button class="admin-delete-btn" onclick="deleteMember('${m.id}')">Delete</button></td>
+        </tr>`;
+    });
+  }
+
+  function addMember(){
+    if(!adminElements.mName.value || !adminElements.mMobile.value || !adminElements.mTicket.value){
+      alert('Please fill all fields');
+      return;
+    }
+    members.push({
+      id: 'LP' + Date.now().toString().slice(-6),
+      name: adminElements.mName.value,
+      mobile: adminElements.mMobile.value,
+      ticket: adminElements.mTicket.value,
+      tier: adminElements.mType.value,
+      visits: 0
+    });
+    saveMembers();
+    adminElements.mName.value = '';
+    adminElements.mMobile.value = '';
+    adminElements.mTicket.value = '';
+    alert('Member added successfully');
+  }
+
+  function deleteMember(id){
+    members = members.filter(x => x.id !== id);
+    saveMembers();
+  }
+
+  function verifyMember(){
+    let v = adminElements.verifyValue.value.trim();
+    let m = members.find(x => x.id === v || x.mobile === v || x.ticket === v);
+    if(m){
+      adminElements.verifyResult.innerHTML = `
+        <div style="color:green; padding: 10px; border: 1px solid green; border-radius: 8px; background: #e8f5e9;">
+          <b>✓ Access Approved</b><br>
+          ${m.name}<br>
+          ${m.tier} Member<br>
+          Member ID: ${m.id}
+        </div>`;
+      m.visits++;
+      saveMembers();
+    } else {
+      adminElements.verifyResult.innerHTML = '<div style="color:red; padding: 10px; border: 1px solid red; border-radius: 8px; background: #ffebee;"><b>✗ Passenger Not Found</b></div>';
+    }
+  }
+
+  // ========================================
+  // 3. GOOGLE IDENTITY SERVICES INIT
+  // ========================================
   function handleCredentialResponse(response) {
     console.log("Encoded JWT ID token: " + response.credential);
     alert("Successfully authenticated with Google! Check console for token.");
     closeAuthModal();
-    // TODO: Send response.credential to your backend for verification
   }
 
-  // Initialize the Google SDK when the window finishes loading
   window.onload = function () {
+    // Initialize Google SDK
     google.accounts.id.initialize({
       client_id: "976848195359-mh3lf51qst8o8jeuq6p8u99me619cktu.apps.googleusercontent.com",
       callback: handleCredentialResponse
     });
 
-    // Render the button in the "Sign In" tab
+    // Render Sign In Button
     const signinBtn = document.getElementById("google-signin-btn");
     if(signinBtn) {
       google.accounts.id.renderButton(
         signinBtn,
-        { theme: "outline", size: "large", width: "356", borderRadius: 10 }  // Matches standard input width
+        { theme: "outline", size: "large", width: "356", borderRadius: 10 }
       );
     }
 
-    // Render the button in the "Join Free" tab
+    // Render Sign Up Button
     const signupBtn = document.getElementById("google-signup-btn");
     if(signupBtn) {
       google.accounts.id.renderButton(
