@@ -515,7 +515,7 @@ footer p { font-size: 12px; color: var(--ink3); }
       <div class="admin-box">
         <h3>Passenger Check-in</h3>
         <div style="display: flex; gap: 10px; margin-top: 12px;">
-          <input class="admin-input" id="verifyValue" placeholder="Ticket / Mobile / Member ID" style="margin: 0;">
+          <input class="admin-input" id="verifyValue" placeholder="Booking ID / Ticket / Mobile / Member ID" style="margin: 0;">
           <button class="btn-solid" onclick="verifyMember()">Verify & Check-in</button>
         </div>
         <div id="verifyResult" style="margin-top: 10px;"></div>
@@ -940,21 +940,44 @@ function deleteMember(id) {
 function verifyMember() {
   const v = document.getElementById('verifyValue').value.trim();
   const res = document.getElementById('verifyResult');
-  const m = members.find(x => x.id === v || x.mobile === v || x.ticket === v);
   
+  // 1. Try to verify by Member Details
+  const m = members.find(x => x.id === v || x.mobile === v || x.ticket === v);
   if(m) {
     res.innerHTML = `
       <div style="color:#2ecc71; padding: 12px; border: 1px solid #2ecc71; border-radius: 8px; background: rgba(46, 204, 113, 0.1);">
-        <b>✓ Access Approved</b><br>${m.name} | ${m.tier} Member | ID: ${m.id}
+        <b>✓ Access Approved (Member)</b><br>${m.name} | ${m.tier} Member | ID: ${m.id}
       </div>`;
     m.visits++;
     totalCheckins++;
     localStorage.setItem('lounge_checkins', totalCheckins);
     document.getElementById('checkinCount').innerText = totalCheckins;
     saveMembers();
-  } else {
-    res.innerHTML = '<div style="color:var(--danger); padding: 12px; border: 1px solid var(--danger); border-radius: 8px; background: rgba(231, 76, 60, 0.1);"><b>✗ Passenger Not Found</b></div>';
+    return;
   }
+  
+  // 2. Try to verify by Booking ID
+  let bookings = JSON.parse(localStorage.getItem('lounge_bookings') || '[]');
+  let bIndex = bookings.findIndex(x => x.id === v);
+  if(bIndex !== -1) {
+    let b = bookings[bIndex];
+    b.status = 'Checked In';
+    localStorage.setItem('lounge_bookings', JSON.stringify(bookings));
+    
+    res.innerHTML = `
+      <div style="color:#2ecc71; padding: 12px; border: 1px solid #2ecc71; border-radius: 8px; background: rgba(46, 204, 113, 0.1);">
+        <b>✓ Access Approved (Booking)</b><br>${b.name} | ${b.lounge}<br>Booking ID: ${b.id} | Status: Checked In
+      </div>`;
+      
+    totalCheckins++;
+    localStorage.setItem('lounge_checkins', totalCheckins);
+    document.getElementById('checkinCount').innerText = totalCheckins;
+    renderAdminBookings(); // Update tables right away
+    return;
+  }
+
+  // 3. Not Found
+  res.innerHTML = '<div style="color:var(--danger); padding: 12px; border: 1px solid var(--danger); border-radius: 8px; background: rgba(231, 76, 60, 0.1);"><b>✗ Passenger Not Found</b></div>';
 }
 </script>
 
