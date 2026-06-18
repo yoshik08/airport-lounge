@@ -41,10 +41,9 @@ function signIn(e){
 function updateNavbar(){
   const nav=document.querySelector('.nav-actions');
   if(localStorage.getItem('loggedIn')==='true'){
-    const user=JSON.parse(localStorage.getItem('currentUser')||'{}');
-    const initial=(user.name||'U').charAt(0).toUpperCase();
-    nav.innerHTML=`<div style="width:40px;height:40px;border-radius:50%;background:#1a6b4a;color:white;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:bold"
-    onclick="logoutUser()" title="Logout">${initial}</div>`;
+    nav.innerHTML=`
+    <div style="width:40px;height:40px;border-radius:50%;background:#1a6b4a;color:white;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:bold"
+    onclick="logoutUser()" title="Logout">👤</div>`;
   }
 }
 
@@ -53,13 +52,15 @@ function logoutUser(){
   location.reload();
 }
 
-function handleBooking(){
-  if(localStorage.getItem('loggedIn')==='true'){
+document.addEventListener('click',function(e){
+  if(e.target.classList.contains('btn-book')){
+    if(localStorage.getItem('loggedIn')!=='true'){
+      openAuthModal('signin');
+      return;
+    }
     alert('Booking Confirmed!');
-  } else {
-    openAuthModal('signin');
   }
-}
+});
 
 document.addEventListener('DOMContentLoaded',updateNavbar);
 </script>
@@ -403,7 +404,7 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
     <li><a href="#">Help</a></li>
   </ul>
   <div class="nav-actions">
-    <button class="btn-ghost" onclick="handleBooking()">Sign in</button>
+    <button class="btn-ghost" onclick="openAuthModal('signin')">Sign in</button>
     <button class="btn-solid" onclick="openAuthModal('signup')">Join free</button>
   </div>
 </nav>
@@ -900,4 +901,14 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
   };
 </script>
 
+
+<script>
+function handleBooking(){
+  if(localStorage.getItem('loggedIn') === 'true'){
+    alert('Booking Confirmed!');
+  }else{
+    openAuthModal('signin');
+  }
+}
+</script>
 </body>
