@@ -39,15 +39,12 @@ function signIn(e){
 }
 
 function updateNavbar(){
-  const nav = document.querySelector('.nav-actions');
-
-  if(localStorage.getItem('loggedIn') === 'true'){
-    const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
-    const initial = (user.name || 'U').charAt(0).toUpperCase();
-
-    nav.innerHTML = `
-      <div style="width:40px;height:40px;border-radius:50%;background:#1a6b4a;color:white;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:bold"
-      onclick="logoutUser()" title="Logout">${initial}</div>`;
+  const nav=document.querySelector('.nav-actions');
+  if(localStorage.getItem('loggedIn')==='true'){
+    const user=JSON.parse(localStorage.getItem('currentUser')||'{}');
+    const initial=(user.name||'U').charAt(0).toUpperCase();
+    nav.innerHTML=`<div style="width:40px;height:40px;border-radius:50%;background:#1a6b4a;color:white;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:bold"
+    onclick="logoutUser()" title="Logout">${initial}</div>`;
   }
 }
 
@@ -56,25 +53,13 @@ function logoutUser(){
   location.reload();
 }
 
-document.addEventListener('click', function(e) {
-  if (!e.target.classList.contains('btn-book')) return;
-
-  if (localStorage.getItem('loggedIn') === 'true') {
-    alert('Booking Confirmed!');
-  } else {
-    openAuthModal('signin');
-  }
-});
-
-
 function handleBooking(){
-  if(localStorage.getItem('loggedIn') === 'true'){
+  if(localStorage.getItem('loggedIn')==='true'){
     alert('Booking Confirmed!');
   } else {
     openAuthModal('signin');
   }
 }
-
 
 document.addEventListener('DOMContentLoaded',updateNavbar);
 </script>
@@ -418,7 +403,7 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
     <li><a href="#">Help</a></li>
   </ul>
   <div class="nav-actions">
-    <button class="btn-ghost" onclick="openAuthModal('signin')">Sign in</button>
+    <button class="btn-ghost" onclick="handleBooking()">Sign in</button>
     <button class="btn-solid" onclick="openAuthModal('signup')">Join free</button>
   </div>
 </nav>
@@ -877,10 +862,7 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
     if(response.credential) {
       console.log("Encoded JWT ID token: " + response.credential);
       localStorage.setItem('loggedIn','true');
-      localStorage.setItem('currentUser',JSON.stringify({
-  name:'Google User',
-  email:'googleuser@gmail.com'
-}));
+      localStorage.setItem('currentUser',JSON.stringify({name:'Google User'}));
       closeAuthModal();
       updateNavbar();
       alert("Successfully logged in with Google!");
