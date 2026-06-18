@@ -66,6 +66,16 @@ document.addEventListener('click', function(e) {
   }
 });
 
+
+function handleBooking(){
+  if(localStorage.getItem('loggedIn') === 'true'){
+    alert('Booking Confirmed!');
+  } else {
+    openAuthModal('signin');
+  }
+}
+
+
 document.addEventListener('DOMContentLoaded',updateNavbar);
 </script>
 
@@ -495,7 +505,7 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
       <div class="card-footer">
         <div class="card-price"><strong>₹1,800</strong> / visit</div>
         <!-- Activated Book Button -->
-        <button class="btn-book" >Book now</button>
+        <button class="btn-book" onclick="handleBooking()">Book now</button>
       </div>
     </div>
   </div>
@@ -522,7 +532,7 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
       <div class="card-footer">
         <div class="card-price"><strong>₹1,200</strong> / visit</div>
         <!-- Activated Book Button -->
-        <button class="btn-book" >Book now</button>
+        <button class="btn-book" onclick="handleBooking()">Book now</button>
       </div>
     </div>
   </div>
@@ -550,7 +560,7 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
       <div class="card-footer">
         <div class="card-price"><strong>₹2,200</strong> / visit</div>
         <!-- Activated Book Button -->
-        <button class="btn-book" >Book now</button>
+        <button class="btn-book" onclick="handleBooking()">Book now</button>
       </div>
     </div>
   </div>
