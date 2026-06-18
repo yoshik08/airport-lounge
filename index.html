@@ -491,7 +491,7 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
       <div class="card-footer">
         <div class="card-price"><strong>₹1,800</strong> / visit</div>
         <!-- Activated Book Button -->
-        <button class="btn-book" onclick="handleBooking()">Book now</button>
+        <button class="btn-book" onclick="handleBooking(this)">Book now</button>
       </div>
     </div>
   </div>
@@ -518,7 +518,7 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
       <div class="card-footer">
         <div class="card-price"><strong>₹1,200</strong> / visit</div>
         <!-- Activated Book Button -->
-        <button class="btn-book" onclick="handleBooking()">Book now</button>
+        <button class="btn-book" onclick="handleBooking(this)">Book now</button>
       </div>
     </div>
   </div>
@@ -546,7 +546,7 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
       <div class="card-footer">
         <div class="card-price"><strong>₹2,200</strong> / visit</div>
         <!-- Activated Book Button -->
-        <button class="btn-book" onclick="handleBooking()">Book now</button>
+        <button class="btn-book" onclick="handleBooking(this)">Book now</button>
       </div>
     </div>
   </div>
@@ -670,7 +670,7 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
         <div class="stat-card"><h3 id="memberCount">0</h3><p>Members</p></div>
         <div class="stat-card"><h3 id="checkins">0</h3><p>Check-ins</p></div>
         <div class="stat-card"><h3>58</h3><p>Lounges</p></div>
-        <div class="stat-card"><h3>87%</h3><p>Occupancy</p></div>
+        <div class="stat-card"><h3>87%</h3><p>Occupancy</p></div><div class="stat-card"><h3 id="bookingCount">0</h3><p>Bookings</p></div>
       </div>
 
       <div class="verify-box">
@@ -700,6 +700,16 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
             <tr><th>ID</th><th>Name</th><th>Mobile</th><th>Ticket</th><th>Tier</th><th>Visits</th><th>Actions</th></tr>
           </thead>
           <tbody id="memberTable"></tbody>
+        </table>
+      </div>
+
+      <div class="member-box">
+        <h3>Bookings</h3>
+        <table class="admin-table">
+          <thead>
+            <tr><th>ID</th><th>Name</th><th>Lounge</th><th>Date</th></tr>
+          </thead>
+          <tbody id="bookingTable"></tbody>
         </table>
       </div>
     </div>
@@ -899,16 +909,53 @@ box-shadow: 0 4px 14px rgba(26,107,74,0.3); font-family: 'DM Sans', sans-serif; 
       );
     }
   };
-</script>
 
-
-<script>
-function handleBooking(){
-  if(localStorage.getItem('loggedIn') === 'true'){
-    alert('Booking Confirmed!');
-  }else{
+function handleBooking(btn){
+  if(localStorage.getItem('loggedIn')!=='true'){
     openAuthModal('signin');
+    return;
   }
+
+  const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  const card = btn.closest('.card');
+  const lounge = card ? card.querySelector('.card-name').innerText : 'Lounge';
+
+  let bookings = JSON.parse(localStorage.getItem('lounge_bookings') || '[]');
+
+  bookings.push({
+    id:'BK'+Date.now(),
+    name:user.name || 'Guest',
+    lounge:lounge,
+    date:new Date().toLocaleString()
+  });
+
+  localStorage.setItem('lounge_bookings', JSON.stringify(bookings));
+
+  alert('Booking Confirmed for ' + lounge + '!');
 }
+
+const oldRenderMembers = renderMembers;
+renderMembers = function(){
+  oldRenderMembers();
+
+  const bookings = JSON.parse(localStorage.getItem('lounge_bookings') || '[]');
+
+  const bc = document.getElementById('bookingCount');
+  if(bc) bc.innerText = bookings.length;
+
+  const table = document.getElementById('bookingTable');
+  if(table){
+    table.innerHTML = bookings.map(b => `
+      <tr>
+        <td>${b.id}</td>
+        <td>${b.name}</td>
+        <td>${b.lounge}</td>
+        <td>${b.date}</td>
+      </tr>
+    `).join('');
+  }
+};
+
 </script>
+
 </body>
